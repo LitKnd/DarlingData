@@ -28,11 +28,11 @@ https://github.com/erikdarlingdata/DarlingData
     WITH pre AS
     (
        SELECT
-           Type = 
+           Type =
                ISNULL(@Type, 0),
-           Future = 
+           Future =
                ISNULL(@Future, 0),
-           Term = 
+           Term =
                POWER(1 + @Rate, @Periods)
     ),
          post AS

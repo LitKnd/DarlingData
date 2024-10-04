@@ -1,23 +1,23 @@
-﻿USE StackOverflow2013;
+USE StackOverflow2013;
 EXEC dbo.DropIndexes;
 SET NOCOUNT ON;
 DBCC FREEPROCCACHE;
-GO 
+GO
 
 /*
 ███████╗██████╗  ██████╗  ██████╗ ██╗  ██╗██╗   ██╗
 ██╔════╝██╔══██╗██╔═══██╗██╔═══██╗██║ ██╔╝╚██╗ ██╔╝
-███████╗██████╔╝██║   ██║██║   ██║█████╔╝  ╚████╔╝ 
-╚════██║██╔═══╝ ██║   ██║██║   ██║██╔═██╗   ╚██╔╝  
-███████║██║     ╚██████╔╝╚██████╔╝██║  ██╗   ██║   
-╚══════╝╚═╝      ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
-                                                   
-██╗  ██╗ █████╗ ███╗   ██╗██████╗ ███████╗         
-██║  ██║██╔══██╗████╗  ██║██╔══██╗██╔════╝         
-███████║███████║██╔██╗ ██║██║  ██║███████╗         
-██╔══██║██╔══██║██║╚██╗██║██║  ██║╚════██║         
-██║  ██║██║  ██║██║ ╚████║██████╔╝███████║         
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝                                                            
+███████╗██████╔╝██║   ██║██║   ██║█████╔╝  ╚████╔╝
+╚════██║██╔═══╝ ██║   ██║██║   ██║██╔═██╗   ╚██╔╝
+███████║██║     ╚██████╔╝╚██████╔╝██║  ██╗   ██║
+╚══════╝╚═╝      ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝
+
+██╗  ██╗ █████╗ ███╗   ██╗██████╗ ███████╗
+██║  ██║██╔══██╗████╗  ██║██╔══██╗██╔════╝
+███████║███████║██╔██╗ ██║██║  ██║███████╗
+██╔══██║██╔══██║██║╚██╗██║██║  ██║╚════██║
+██║  ██║██║  ██║██║ ╚████║██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
 */
 
 
@@ -45,23 +45,23 @@ Turn on query plans
 /*
 Run a silly update!
 */
-UPDATE t 
-    SET t.MaxScore = 
+UPDATE t
+    SET t.MaxScore =
         (
-            SELECT 
+            SELECT
                 MAX(Score)
-            FROM 
+            FROM
             (
-                SELECT 
-                    tsbu.QuestionScore 
-                FROM dbo.TotalScoreByUser AS tsbu 
+                SELECT
+                    tsbu.QuestionScore
+                FROM dbo.TotalScoreByUser AS tsbu
                 WHERE tsbu.Id = t.Id
-                
+
                 UNION ALL
-                
-                SELECT 
-                    tsbu2.AnswerScore 
-                FROM dbo.TotalScoreByUser AS tsbu2 
+
+                SELECT
+                    tsbu2.AnswerScore
+                FROM dbo.TotalScoreByUser AS tsbu2
                 WHERE tsbu2.Id = t.Id
             ) AS x (Score)
         )
@@ -92,56 +92,56 @@ WHERE t.MaxScore IS NOT NULL;
 /*
 DIY Halloween Protection
 */
-DROP TABLE IF EXISTS 
+DROP TABLE IF EXISTS
     #update;
 GO
 
-CREATE TABLE 
+CREATE TABLE
    #update
 (
-    Id INT PRIMARY KEY CLUSTERED, 
+    Id INT PRIMARY KEY CLUSTERED,
     MaxScore INT
 );
 
-INSERT 
+INSERT
     #update WITH(TABLOCK)
-( 
-    Id, 
-    MaxScore 
-)
-SELECT 
-    Id, 
-    MaxScore = 
-        MAX(Score)
-FROM 
 (
-    SELECT 
-        tsbu.Id, 
-        tsbu.QuestionScore 
-    FROM dbo.TotalScoreByUser AS tsbu 
-    
+    Id,
+    MaxScore
+)
+SELECT
+    Id,
+    MaxScore =
+        MAX(Score)
+FROM
+(
+    SELECT
+        tsbu.Id,
+        tsbu.QuestionScore
+    FROM dbo.TotalScoreByUser AS tsbu
+
     UNION ALL
-    
-    SELECT 
-        tsbu2.Id, 
-        tsbu2.AnswerScore 
+
+    SELECT
+        tsbu2.Id,
+        tsbu2.AnswerScore
     FROM dbo.TotalScoreByUser AS tsbu2
 ) AS x (Id, Score)
-GROUP BY 
+GROUP BY
     x.Id;
 
-UPDATE tsbu 
+UPDATE tsbu
     SET tsbu.MaxScore = u.MaxScore
 FROM dbo.TotalScoreByUser AS tsbu
-JOIN #update AS u 
+JOIN #update AS u
   ON u.Id = tsbu.Id
 WHERE 1 = 1;
 
 
 
-UPDATE 
+UPDATE
     t WITH(TABLOCKX)
-SET 
+SET
     t.MaxScore = NULL
 FROM dbo.TotalScoreByUser AS t
 WHERE t.MaxScore IS NOT NULL;
@@ -157,6 +157,6 @@ Why was the temp table better?
  * Manual phase separation! Loading into #temp tables
    is way more efficient than data being loaded into spools.
    Putting data into spools is a row-by-row venture, with
-   none of the more recent tempdb optimizations 
+   none of the more recent tempdb optimizations
 
 */

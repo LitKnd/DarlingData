@@ -1,9 +1,9 @@
-﻿USE StackOverflow2013;
+USE StackOverflow2013;
 EXEC dbo.DropIndexes;
 SET NOCOUNT ON;
 DBCC FREEPROCCACHE;
-GO 
-    
+GO
+
 
 
 /*
@@ -12,7 +12,7 @@ GO
 ██████╔╝██║   ██║   ██╔████╔██║███████║██████╔╝███████╗
 ██╔══██╗██║   ██║   ██║╚██╔╝██║██╔══██║██╔═══╝ ╚════██║
 ██████╔╝██║   ██║   ██║ ╚═╝ ██║██║  ██║██║     ███████║
-╚═════╝ ╚═╝   ╚═╝   ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝                                                                                                                                                        
+╚═════╝ ╚═╝   ╚═╝   ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝
 */
 
 /*
@@ -36,11 +36,11 @@ Sup with that?
 /*
 When are they useful?
 */
-WITH 
-    comment_count AS 
+WITH
+    comment_count AS
 (
-    SELECT 
-        c.UserId, 
+    SELECT
+        c.UserId,
         records = COUNT_BIG(*)
     FROM dbo.Comments AS c
     WHERE c.Score > 9
@@ -52,7 +52,7 @@ SELECT TOP (100)
 FROM dbo.Users AS u
 JOIN comment_count AS cc
   ON cc.UserId = u.Id
-ORDER BY 
+ORDER BY
     u.Reputation DESC;
 
 /*
@@ -75,14 +75,14 @@ Like here.
 /*
 When are they not so useful?
 */
-WITH 
+WITH
     badge_count AS
 (
-    SELECT 
-        b.UserId, 
+    SELECT
+        b.UserId,
         records = COUNT_BIG(*)
     FROM dbo.Badges AS b
-    GROUP BY 
+    GROUP BY
         b.UserId
 )
 SELECT TOP (100)
@@ -91,7 +91,7 @@ SELECT TOP (100)
 FROM dbo.Users AS u
 JOIN badge_count AS bc
   ON bc.UserId = u.Id
-ORDER BY 
+ORDER BY
     u.Reputation DESC;
 
 /*
@@ -110,16 +110,16 @@ Not every Bitmap hits the Scan
 
 Some only get to the Repartition Streams
 */
-SELECT 
+SELECT
     records = COUNT_BIG(*)
 FROM dbo.Users AS u
 WHERE u.Reputation > 1000
 AND EXISTS
-( 
-    SELECT 
+(
+    SELECT
         1/0
     FROM dbo.Comments AS c
-    WHERE c.UserId = u.Id 
+    WHERE c.UserId = u.Id
 );
 
 

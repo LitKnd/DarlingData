@@ -1,4 +1,4 @@
-﻿USE StackOverflow2013;
+USE StackOverflow2013;
 EXEC dbo.DropIndexes;
 SET NOCOUNT ON;
 DBCC FREEPROCCACHE;
@@ -7,21 +7,21 @@ GO
 /*
     Create these ahead of time, if you can
 */
-CREATE INDEX 
-    users 
-ON dbo.Users 
+CREATE INDEX
+    users
+ON dbo.Users
     (CreationDate, Reputation, Id)
 WITH
     (SORT_IN_TEMPDB = ON, DATA_COMPRESSION = PAGE);
 GO
 
-CREATE INDEX 
+CREATE INDEX
     posts
-ON dbo.Posts 
+ON dbo.Posts
     (OwnerUserId, Id)
-INCLUDE 
+INCLUDE
     (PostTypeId)
-WHERE 
+WHERE
     PostTypeId = 1;
 GO
 
@@ -31,7 +31,7 @@ GO
 ██║        ██║   █████╗  ███████╗
 ██║        ██║   ██╔══╝  ╚════██║
 ╚██████╗   ██║   ███████╗███████║
- ╚═════╝   ╚═╝   ╚══════╝╚══════╝                                 
+ ╚═════╝   ╚═╝   ╚══════╝╚══════╝
 */
 
 /*
@@ -50,9 +50,9 @@ SELECT
     x.*
 FROM
 (
-    SELECT 
-        u.Id 
-    FROM dbo.Users AS u 
+    SELECT
+        u.Id
+    FROM dbo.Users AS u
     WHERE u.Id = 22656
 ) AS x
 JOIN x AS x2
@@ -64,16 +64,16 @@ SELECT
     x.*
 FROM
 (
-    SELECT 
-        u.Id 
-    FROM dbo.Users AS u 
+    SELECT
+        u.Id
+    FROM dbo.Users AS u
     WHERE u.Id = 22656
 ) AS x
-JOIN 
+JOIN
 (
-    SELECT 
-        u.Id 
-    FROM dbo.Users AS u 
+    SELECT
+        u.Id
+    FROM dbo.Users AS u
     WHERE u.Id = 22656
 ) AS x2
   ON x.Id = x2.Id;
@@ -86,15 +86,15 @@ CTEs don't have that problem.
 WITH
     x AS
 (
-    SELECT 
-        u.Id 
-    FROM dbo.Users AS u 
+    SELECT
+        u.Id
+    FROM dbo.Users AS u
     WHERE u.Id = 22656
 )
-SELECT 
-    x.* 
-FROM x 
-JOIN x AS x2 
+SELECT
+    x.*
+FROM x
+JOIN x AS x2
   ON x.Id = x2.Id;
 
 /*
@@ -105,9 +105,9 @@ Make sure query plans are on.
 WITH
     cte AS
 (
-    SELECT 
-        u.* 
-    FROM dbo.Users AS u 
+    SELECT
+        u.*
+    FROM dbo.Users AS u
     WHERE u.Id = 22656
 )
 SELECT cte.* FROM cte
@@ -119,9 +119,9 @@ SELECT cte.* FROM cte;
 WITH
     cte AS
 (
-    SELECT 
-        u.Id 
-    FROM dbo.Users AS u 
+    SELECT
+        u.Id
+    FROM dbo.Users AS u
     WHERE u.Id = 22656
 )
 SELECT
@@ -135,7 +135,7 @@ JOIN cte AS c3
 
 /*
   This gets worse as your query gets more complicated
-  Just grab the estimated plan, here   
+  Just grab the estimated plan, here
 */
 WITH
     cte AS

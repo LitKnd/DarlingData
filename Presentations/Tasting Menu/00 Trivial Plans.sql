@@ -1,24 +1,24 @@
-﻿USE StackOverflow2013;
+USE StackOverflow2013;
 EXEC dbo.DropIndexes;
 SET NOCOUNT ON;
 DBCC FREEPROCCACHE;
-GO    
+GO
 
 
 /*
-████████╗██████╗ ██╗██╗   ██╗██╗ █████╗ ██╗     
-╚══██╔══╝██╔══██╗██║██║   ██║██║██╔══██╗██║     
-   ██║   ██████╔╝██║██║   ██║██║███████║██║     
-   ██║   ██╔══██╗██║╚██╗ ██╔╝██║██╔══██║██║     
+████████╗██████╗ ██╗██╗   ██╗██╗ █████╗ ██╗
+╚══██╔══╝██╔══██╗██║██║   ██║██║██╔══██╗██║
+   ██║   ██████╔╝██║██║   ██║██║███████║██║
+   ██║   ██╔══██╗██║╚██╗ ██╔╝██║██╔══██║██║
    ██║   ██║  ██║██║ ╚████╔╝ ██║██║  ██║███████╗
    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝╚═╝  ╚═╝╚══════╝
-                                                
-██████╗ ██╗      █████╗ ███╗   ██╗███████╗      
-██╔══██╗██║     ██╔══██╗████╗  ██║██╔════╝      
-██████╔╝██║     ███████║██╔██╗ ██║███████╗      
-██╔═══╝ ██║     ██╔══██║██║╚██╗██║╚════██║      
-██║     ███████╗██║  ██║██║ ╚████║███████║      
-╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝      
+
+██████╗ ██╗      █████╗ ███╗   ██╗███████╗
+██╔══██╗██║     ██╔══██╗████╗  ██║██╔════╝
+██████╔╝██║     ███████║██╔██╗ ██║███████╗
+██╔═══╝ ██║     ██╔══██║██║╚██╗██║╚════██║
+██║     ███████╗██║  ██║██║ ╚████║███████║
+╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝
 */
 
 /*
@@ -31,7 +31,7 @@ TURN ON QUERY PLANS DUMMY
 
 
 /*Trivial plan*/
-SELECT TOP (100) 
+SELECT TOP (100)
     u.*
 FROM dbo.Users AS u;
 
@@ -44,18 +44,18 @@ Sometimes you have to highlight a different one first to get properties to load 
 
 
 /*You can do some funny things that are still trivial*/
-SELECT TOP (10000) 
-    u.*, 
-    n = 
-        ROW_NUMBER() OVER 
-        ( 
-            PARTITION BY 
-                u.Id 
-            ORDER BY 
-                u.Id 
-        ) 
+SELECT TOP (10000)
+    u.*,
+    n =
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY
+                u.Id
+            ORDER BY
+                u.Id
+        )
 FROM dbo.Users AS u
-ORDER BY 
+ORDER BY
     u.Id;
 
 
@@ -64,19 +64,19 @@ ORDER BY
 /*What gets us to full optimization?*/
 
 /*Unique column*/
-SELECT DISTINCT TOP (1000) 
+SELECT DISTINCT TOP (1000)
     u.* /*Not this, we have a unique column in the table*/
 FROM dbo.Users AS u;
 
 /*Non-unique column - Run both of these together!*/
 
 /*Few rows?*/
-SELECT DISTINCT TOP (4304) 
+SELECT DISTINCT TOP (4304)
     u.Reputation /*But this will!*/
 FROM dbo.Users AS u;
 
 /*Some more rows?*/
-SELECT DISTINCT TOP (5000) 
+SELECT DISTINCT TOP (5000)
     u.Reputation /*And this will!*/
 FROM dbo.Users AS u;
 
@@ -95,10 +95,10 @@ There are obvious things that get full optimization, too
 */
 
 /*Order by without an index?*/
-SELECT TOP (100) 
+SELECT TOP (100)
     u.Id
 FROM dbo.Users AS u
-ORDER BY 
+ORDER BY
     u.AccountId;
 
 
@@ -110,11 +110,11 @@ ORDER BY
 
 
 /*What about a really simple subquery?*/
-SELECT TOP (100) 
+SELECT TOP (100)
     u.Id
 FROM dbo.Users AS u;
 
-SELECT TOP (100) 
+SELECT TOP (100)
     Id = (SELECT u.Id) --Only difference
 FROM dbo.Users AS u;
 
@@ -126,11 +126,11 @@ FROM dbo.Users AS u;
 
 
 /*What about an even simpler subquery?*/
-SELECT 
+SELECT
     records = COUNT_BIG(*)
 FROM dbo.Users AS u;
 
-SELECT 
+SELECT
     records = COUNT_BIG(*)
 FROM dbo.Users AS u
 WHERE 1 = (SELECT 1);
@@ -142,18 +142,18 @@ WHERE 1 = (SELECT 1);
 Why are trivial plans a problem?
 When does it matter?
 
-When you miss out on optimizations because they're not explored.    
+When you miss out on optimizations because they're not explored.
 */
 
 
 /*Nothing for you*/
-SELECT 
+SELECT
     u.*
 FROM dbo.Users AS u
 WHERE u.Reputation = 2;
 
 /*Missing index requests*/
-SELECT 
+SELECT
     u.*
 FROM dbo.Users AS u
 WHERE u.Reputation = 2
@@ -165,13 +165,13 @@ AND   1 = (SELECT 1);
 /*When Trivial Plans are a real bummer*/
 
 /*Add a check constraint so we know Reputation boundaries*/
-ALTER TABLE 
+ALTER TABLE
     dbo.Users
-ADD CONSTRAINT 
-    cn_rep 
-CHECK 
+ADD CONSTRAINT
+    cn_rep
+CHECK
 (
-    Reputation >= 1 
+    Reputation >= 1
     AND Reputation <= 2000000
 );
 
@@ -180,15 +180,15 @@ CHECK
 Make sure it's trusted
 ... Or not NOT trusted.
 */
-SELECT 
-    cc.name, 
-    cc.is_not_trusted 
+SELECT
+    cc.name,
+    cc.is_not_trusted
 FROM sys.check_constraints AS cc;
 
 /*Query that should bail out (assuming you ran DropIndexes along the way as instructed) */
-SELECT 
-    u.DisplayName, 
-    u.Age, 
+SELECT
+    u.DisplayName,
+    u.Age,
     u.Reputation
 FROM dbo.Users AS u
 WHERE u.Reputation = 0;
@@ -199,9 +199,9 @@ Check IO
 */
 
 /*Query that does bail out*/
-SELECT 
-    u.DisplayName, 
-    u.Age, 
+SELECT
+    u.DisplayName,
+    u.Age,
     u.Reputation
 FROM dbo.Users AS u
 WHERE u.Reputation = 0
@@ -211,13 +211,13 @@ AND   1 = (SELECT 1);
 Check IO again
 */
 
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
 
 /*
 Trivial plans pair well with

@@ -1,4 +1,4 @@
-﻿USE StackOverflow2013;
+USE StackOverflow2013;
 EXEC dbo.DropIndexes;
 DBCC FREEPROCCACHE;
 SET STATISTICS TIME, IO ON;
@@ -220,11 +220,11 @@ GO
             b.Name
         FROM dbo.Badges AS b
         WHERE b.UserId = u.Id
-        ORDER BY 
+        ORDER BY
             b.Date DESC
     ) AS b
     WHERE u.Reputation >= 10000
-    ORDER BY 
+    ORDER BY
         u.Reputation DESC;
 
 
@@ -239,11 +239,11 @@ GO
             b.Name
         FROM dbo.Badges AS b
         WHERE b.UserId = u.Id
-        ORDER BY 
+        ORDER BY
             b.Date DESC
     ) AS b
     WHERE u.Reputation >= 10000
-    ORDER BY 
+    ORDER BY
         u.Reputation DESC;
 
 
@@ -287,11 +287,11 @@ But this isn't too smart, because we still have to sort.
             b.Name
         FROM dbo.Badges AS b
         WHERE b.UserId = u.Id
-        ORDER BY 
+        ORDER BY
             b.Date DESC
     ) AS b
     WHERE u.Reputation >= 10000
-    ORDER BY 
+    ORDER BY
         u.Reputation DESC;
 
 
@@ -399,9 +399,9 @@ But this isn't too smart, because we still have to sort.
         AND p.PostTypeId IN (1, 2)
     ) AS ca
     WHERE ca.ScoreOrder <= 50
-    GROUP BY 
+    GROUP BY
         wp.UserId
-    ORDER BY 
+    ORDER BY
         wp.UserId;
 
 
@@ -486,9 +486,9 @@ How can we fix it?
         AND p.PostTypeId IN (1, 2)
     ) AS ca
     WHERE ca.ScoreOrder <= 50
-    GROUP BY 
+    GROUP BY
         wp.UserId
-    ORDER BY 
+    ORDER BY
         wp.UserId;
 
 /*
@@ -756,7 +756,7 @@ Let's get it on!
         dbo.Blueprint_Threads
     AS
     BEGIN
-        SELECT 
+        SELECT
             records = COUNT_BIG(*)
         FROM dbo.Users AS u
         JOIN dbo.Comments AS c
